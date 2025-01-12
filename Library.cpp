@@ -235,45 +235,48 @@ public:
 
     // Add a book to the library
     void addBook(Book book) {
+        // Add the book to all data structures
         linkedList.insert(book);
         bst.insert(book);
         hashTable.insert(book);
 
+        // Push the "add" action onto the undo stack
         Action* addAction = new Action(ADD, book);
         undoStack.push(addAction);
 
         cout << "Book added: " << book.title << endl;
 
+        // Save the updated book list to the file
         saveBooks();
     }
 
     // Delete a book from the library
-    void deleteBook(const string& title) {
+    //void deleteBook(const string& title) {
 
-        cout << "Attempting to delete book with title: " << title << endl;
+    //    cout << "Attempting to delete book with title: " << title << endl;
 
-        LinkedListNode* bookNode = linkedList.getHead();
-        while (bookNode && bookNode->book.title != title) {
-            bookNode = bookNode->next;
-        }
+    //    LinkedListNode* bookNode = linkedList.getHead();
+    //    while (bookNode && bookNode->book.title != title) {
+    //        bookNode = bookNode->next;
+    //    }
 
-        if (bookNode) {
-            string ISBN = bookNode->book.ISBN;
-            linkedList.deleteBook(title);
-            bst.deleteBook(title);
-            hashTable.deleteBook(ISBN);
+    //    if (bookNode) {
+    //        string ISBN = bookNode->book.ISBN;
+    //        linkedList.deleteBook(title);
+    //        bst.deleteBook(title);
+    //        hashTable.deleteBook(ISBN);
 
-            Action* deleteAction = new Action(DELETE, bookNode->book);
-            undoStack.push(deleteAction);
+    //        Action* deleteAction = new Action(DELETE, bookNode->book);
+    //        undoStack.push(deleteAction);
 
-            cout << "Book deleted: " << title << endl;
+    //        cout << "Book deleted: " << title << endl;
 
-            saveBooks();
-        }
-        else {
-            cout << "Book not found: " << title << endl;
-        }
-    }
+    //        saveBooks();
+    //    }
+    //    else {
+    //        cout << "Book not found: " << title << endl;
+    //    }
+    //}
 
     // Display all books in the library
     void displayBooks() {
@@ -294,15 +297,37 @@ public:
 
         Action* lastAction = undoStack.pop();
         if (lastAction->type == ADD) {
-            deleteBook(lastAction->book.title);
-            cout << "Undo: Book '" << lastAction->book.title << "' removed." << endl;
+            // Remove the book from all data structures
+            string title = lastAction->book.title;
+            string ISBN = lastAction->book.ISBN;
+
+            // Remove from linked list
+            LinkedListNode* temp = linkedList.getHead();
+            while (temp && temp->book.title != title) {
+                temp = temp->next;
+            }
+            if (temp) {
+                linkedList.deleteBook(title);
+            }
+
+            // Remove from binary search tree
+            bst.deleteBook(title);
+
+            // Remove from hash table
+            hashTable.deleteBook(ISBN);
+
+            cout << "Undo: Book '" << title << "' removed." << endl;
         }
         else if (lastAction->type == DELETE) {
+            // If the action was a "delete," add the book back
             addBook(lastAction->book);
             cout << "Undo: Book '" << lastAction->book.title << "' added back." << endl;
         }
 
+        // Free memory for the action
         delete lastAction;
+
+        saveBooks();
     }
 
     // Librarian login
@@ -457,13 +482,12 @@ public:
                             do {
                                 cout << "\n\nBook Operations\n";
                                 cout << "1. Add Book\n";
-                                cout << "2. Delete Book\n";
+                                cout << "2. Undo\n";
                                 cout << "3. Display All Books\n";
                                 cout << "4. Display Issued Books\n";
                                 cout << "5. Search Book by ISBN\n";
                                 cout << "6. Search Book by Title\n";
-                                cout << "7. Undo Last Action\n";
-                                cout << "8. Back to Main Menu\n";
+                                cout << "7. Back to Main Menu\n";
                                 cout << "Enter your choice: ";
                                 cin >> choice;
 
@@ -480,11 +504,15 @@ public:
                                     break;
 
                                 case 2:
-                                    cout << "Enter book title to delete: ";
-                                    cin.ignore();
-                                    getline(cin, title);
-                                    deleteBook(title);
+                                    undo();
                                     break;
+
+                                //case 2:
+                                //    cout << "Enter book title to delete: ";
+                                //    cin.ignore();
+                                //    getline(cin, title);
+                                //    deleteBook(title);
+                                //    break;
 
                                 case 3:
                                     displayBooks();
@@ -512,11 +540,8 @@ public:
                                     }
                                     break;
 
-                                case 7:
-                                    undo();
-                                    break;
 
-                                case 8:
+                                case 7:
                                     cout << "Returning to main menu..." << endl;
                                     break;
 
@@ -530,7 +555,7 @@ public:
 
                                 system("CLS");
 
-                            } while (choice != 8);
+                            } while (choice != 7);
                             break;
 
                         case 3:
