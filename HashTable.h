@@ -66,14 +66,14 @@ public:
                 else {
                     previous->next = current->next;
                 }
-                delete current;
+                delete current;    // Free memory of the deleted node
+                current = nullptr; // Avoid dangling pointer
                 cout << "Book with ISBN " << ISBN << " deleted from hash table." << endl;
                 return;
             }
             previous = current;
             current = current->next;
         }
-
         cout << "Book with ISBN " << ISBN << " not found in hash table." << endl;
     }
 
