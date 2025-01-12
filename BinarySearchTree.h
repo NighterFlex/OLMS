@@ -77,7 +77,7 @@ public:
         BSTNode* parent = nullptr;
         BSTNode* temp = root;
 
-        // Find the node to delete and its parent.
+        // Find the node to delete and its parent
         while (temp != nullptr && temp->book.title != title) {
             parent = temp;
             if (title < temp->book.title) {
@@ -92,7 +92,7 @@ public:
             return;
         }
 
-        // Case 1: Node has no children or only one child.
+        // Case 1: Node has no children or only one child
         if (temp->left == nullptr) {
             BSTNode* child = temp->right;
             if (parent == nullptr) {
@@ -104,7 +104,8 @@ public:
             else {
                 parent->right = child;
             }
-            delete temp;
+            delete temp;    // Free memory of the deleted node
+            temp = nullptr; // Avoid dangling pointer
         }
         else if (temp->right == nullptr) {
             BSTNode* child = temp->left;
@@ -117,14 +118,15 @@ public:
             else {
                 parent->right = child;
             }
-            delete temp;
+            delete temp;    // Free memory of the deleted node
+            temp = nullptr; // Avoid dangling pointer
         }
-        // Case 2: Node has two children.
+        // Case 2: Node has two children
         else {
             BSTNode* successor = minValueNode(temp->right);
             temp->book = successor->book;
             string successorTitle = successor->book.title;
-            deleteBook(successorTitle);
+            deleteBook(successorTitle);  // Recursively delete the successor
         }
 
         cout << "Book deleted from BST." << endl;
