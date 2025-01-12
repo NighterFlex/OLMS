@@ -44,6 +44,7 @@ public:
             LinkedListNode* temp = head;
             head = head->next;  // Update head to the next node
             delete temp;        // Free memory of the deleted node
+            temp = nullptr;     // Avoid dangling pointer
             cout << "Book deleted from Linked list: " << title << endl;
             return;
         }
@@ -63,6 +64,7 @@ public:
         LinkedListNode* bookToDelete = temp->next;
         temp->next = temp->next->next;  // Bypass the node to be deleted
         delete bookToDelete;            // Free memory of the deleted node
+        bookToDelete = nullptr;         // Avoid dangling pointer
         cout << "Book deleted from Linked list: " << title << endl;
     }
 
@@ -74,6 +76,7 @@ public:
                 << (temp->book.availability ? "Available" : "Issued") << endl;
             temp = temp->next;
         }
+        cout << "No Books to display." << endl;
     }
 
     LinkedListNode* getHead() {
